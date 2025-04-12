@@ -81,13 +81,20 @@ export default function Dashboard() {
     fetchMeals();
   };
 
-  const handleDeleteMeal = (mealId: string) => {
-    if (!meals) return;
-    setMeals(meals.filter((meal) => meal._id !== mealId));
+  const handleDeleteMeal = async (mealId: string) => {
+    try {
+      const res = await fetch(`/api/meal/delete/${mealId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Error deleting meal");
 
-    toast("Refeição excluída", {
-      description: "A refeição foi excluída com sucesso.",
-    });
+      fetchMeals();
+    } catch (error) {
+      console.error("Error deleting meal:", error);
+      toast.error("Erro ao deletar refeição", {
+        description: "Não foi possível deletar a refeição.",
+      });
+    }
   };
 
   return (
