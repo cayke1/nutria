@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Meal } from "@/@types/meal";
+import { Meal } from "@/@types";
 import { Navbar } from "@/components/layouts/Navbar";
 import { Footer } from "@/components/layouts/Footer";
 import { MealList } from "@/components/dashboard/MealList";
