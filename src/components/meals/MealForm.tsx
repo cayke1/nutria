@@ -203,7 +203,7 @@ export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
             control={form.control}
             name="time"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col">
                 <FormLabel>Hora</FormLabel>
                 <div className="relative">
                   <FormControl>
