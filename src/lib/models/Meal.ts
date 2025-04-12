@@ -4,18 +4,18 @@ const mealSchema = new Schema({
   name: { type: String, required: true },
   description: String,
   calories: { type: Number, required: true },
-  datetime: { type: Date, required: true },
+  dateTime: { type: String, required: true },
   type: {
     type: String,
     enum: ["breakfast", "lunch", "snack", "dinner"],
     required: true,
   },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
+  createdAt: { type: String, default: Date.now },
+  updatedAt: { type: String, default: Date.now },
 });
 
 mealSchema.pre("save", function (next) {
-  this.updatedAt = new Date();
+  this.updatedAt = new Date().toISOString();
   next();
 });
 

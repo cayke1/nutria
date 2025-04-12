@@ -20,8 +20,8 @@ import { MealForm } from "@/components/meals/MealForm";
 
 interface MealListProps {
   meals: Meal[];
-  onAddMeal: (meal: Omit<Meal, "id">) => void;
-  onUpdateMeal: (mealId: string, meal: Omit<Meal, "id">) => void;
+  onAddMeal: (meal: Omit<Meal, "_id">) => void;
+  onUpdateMeal: (mealId: string, meal: Omit<Meal, "_id">) => void;
   onDeleteMeal: (mealId: string) => void;
 }
 
@@ -46,7 +46,7 @@ export function MealList({
     setIsEditDialogOpen(true);
   };
 
-  const handleUpdate = (updatedMeal: Omit<Meal, "id">) => {
+  const handleUpdate = (updatedMeal: Omit<Meal, "_id">) => {
     if (selectedMeal) {
       onUpdateMeal(selectedMeal._id, updatedMeal);
       setIsEditDialogOpen(false);

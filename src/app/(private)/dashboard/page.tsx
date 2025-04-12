@@ -12,42 +12,73 @@ import { Loader } from "lucide-react";
 export default function Dashboard() {
   const [meals, setMeals] = useState<Meal[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const fetchMeals = async () => {
+    if (!isLoading) setIsLoading(true);
+    const res = await fetch("/api/meal/getAll");
+
+    if (!res.ok) {
+      console.log(res);
+      toast.error("Erro ao buscar refeições", {
+        description: "Não foi possível carregar as refeições.",
+      });
+      return;
+    }
+
+    const data = await res.json();
+    setMeals(data);
+    setIsLoading(false);
+  };
   useEffect(() => {
-    const fetchMeals = async () => {
-      const res = await fetch("/api/meal/getAll");
-
-      if (!res.ok) {
-        console.log(res);
-        toast.error("Erro ao buscar refeições", {
-          description: "Não foi possível carregar as refeições.",
-        });
-        return;
-      }
-
-      const data = await res.json();
-      setMeals(data);
-      setIsLoading(false);
-    };
     if (isLoading) fetchMeals();
   }, [meals, isLoading]);
 
-  const handleAddMeal = (newMeal: Omit<Meal, "id">) => {
-    if (!meals) return;
-    const meal = {
-      ...newMeal,
-      id: uuidv4(),
-    };
+  const handleAddMeal = async (newMeal: Omit<Meal, "_id">) => {
+    try {
+      const res = await fetch("/api/meal/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...newMeal,
+        }),
+      });
 
-    setMeals([...meals, meal]);
+      if (!res.ok) throw new Error("Error creating meal");
+
+      fetchMeals();
+      toast.success("Refeição criada com sucesso");
+    } catch (error) {
+      console.error("Error creating meal:", error);
+      toast.error("Erro ao criar refeição", {
+        description: "Não foi possível criar a refeição.",
+      });
+    }
   };
 
-  const handleUpdateMeal = (mealId: string, updatedMeal: Omit<Meal, "id">) => {
-    if (!meals) return;
-    setMeals(
-      meals.map((meal) =>
-        meal._id === mealId ? { ...updatedMeal, id: mealId } : meal
-      )
-    );
+  const handleUpdateMeal = async (
+    mealId: string,
+    updatedMeal: Omit<Meal, "_id">
+  ) => {
+    const res = await fetch(`/api/meal/update/${mealId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...updatedMeal,
+      }),
+    });
+
+    if (!res.ok) {
+      console.log(res);
+      toast.error("Erro ao atualizar refeição", {
+        description: "Não foi possível atualizar a refeição.",
+      });
+      return;
+    }
+    fetchMeals();
   };
 
   const handleDeleteMeal = (mealId: string) => {
