@@ -48,7 +48,7 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
             <Badge variant="secondary" className="mr-2">
               {mealTypeLabels[meal.type]}
             </Badge>
-            <span>{format(new Date(meal.datetime), "dd/MM/yyyy • HH:mm")}</span>
+            <span>{format(new Date(meal.dateTime), "dd/MM/yyyy • HH:mm")}</span>
           </div>
 
           <div className="flex space-x-1">
@@ -63,7 +63,7 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onDelete(meal.id)}
+              onClick={() => onDelete(meal._id)}
               className="h-8 w-8 text-gray-500 hover:text-red-600"
             >
               <Trash2 size={16} />

@@ -48,7 +48,7 @@ export function MealList({
 
   const handleUpdate = (updatedMeal: Omit<Meal, "id">) => {
     if (selectedMeal) {
-      onUpdateMeal(selectedMeal.id, updatedMeal);
+      onUpdateMeal(selectedMeal._id, updatedMeal);
       setIsEditDialogOpen(false);
       setSelectedMeal(null);
     }
@@ -109,7 +109,7 @@ export function MealList({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredMeals.map((meal) => (
               <MealCard
-                key={meal.id}
+                key={meal._id}
                 meal={meal}
                 onEdit={handleEdit}
                 onDelete={onDeleteMeal}

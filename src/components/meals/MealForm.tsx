@@ -51,22 +51,22 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface MealFormProps {
   meal?: Meal;
-  onSubmit: (meal: Omit<Meal, "id">) => void;
+  onSubmit: (meal: Omit<Meal, "_id">) => void;
   onCancel: () => void;
 }
 
 export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
   const [date, setDate] = useState<Date | undefined>(
-    meal?.datetime || new Date()
+    meal ? new Date(meal.dateTime) : undefined
   );
 
   const defaultValues: FormValues = {
     name: meal?.name || "",
     description: meal?.description || "",
     calories: meal?.calories || 0,
-    date: meal?.datetime || new Date(),
-    time: meal?.datetime
-      ? format(meal.datetime, "HH:mm")
+    date: meal ? new Date(meal.dateTime) : new Date(),
+    time: meal?.dateTime
+      ? format(meal.dateTime, "HH:mm")
       : format(new Date(), "HH:mm"),
     type: meal?.type || "breakfast",
   };
@@ -79,15 +79,17 @@ export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
   const handleSubmit = (values: FormValues) => {
     try {
       const [hours, minutes] = values.time.split(":").map(Number);
-      const datetime = new Date(values.date);
-      datetime.setHours(hours, minutes);
+      const dateTime = new Date(values.date);
+      dateTime.setHours(hours, minutes);
 
       onSubmit({
         name: values.name,
         description: values.description,
         calories: values.calories,
-        datetime,
+        dateTime: dateTime.toISOString(),
         type: values.type,
+        createdAt: new Date(Date.now()).toISOString(),
+        updatedAt: new Date(Date.now()).toISOString(),
       });
 
       toast.success(meal ? "Refeição atualizada" : "Refeição adicionada", {

@@ -12,7 +12,7 @@ export function CaloriesCard({ meals }: CaloriesCardProps) {
   const todayString = format(today, "yyyy-MM-dd");
 
   const todayMeals = meals.filter((meal) => {
-    const mealDate = new Date(meal.datetime);
+    const mealDate = new Date(meal.dateTime);
     return format(mealDate, "yyyy-MM-dd") === todayString;
   });
 
@@ -38,7 +38,7 @@ export function CaloriesCard({ meals }: CaloriesCardProps) {
           {todayMeals.length > 0 ? (
             todayMeals.map((meal) => (
               <div
-                key={meal.id}
+                key={meal._id}
                 className="flex justify-between items-center bg-white/10 rounded p-2 text-sm"
               >
                 <span>{meal.name}</span>

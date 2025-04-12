@@ -2,11 +2,13 @@
 export type MealType = 'breakfast' | 'lunch' | 'snack' | 'dinner';
 
 export interface Meal {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   calories: number;
-  datetime: Date;
+  createdAt: string;
+  updatedAt: string;
+  dateTime: string;
   type: MealType;
 }
 
