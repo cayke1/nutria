@@ -2,14 +2,16 @@
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Meal } from "@/@types";
-import { Navbar } from "@/components/layouts/Navbar";
+import { Navbar } from "@/components/dashboard/layout/Navbar";
 import { Footer } from "@/components/layouts/Footer";
 import { MealList } from "@/components/dashboard/MealList";
 import { CaloriesCard } from "@/components/dashboard/CaloriesCard";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
+import { useAuth } from "@/lib/contexts/auth-context";
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [meals, setMeals] = useState<Meal[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -119,7 +121,7 @@ export default function Dashboard() {
           <main className="flex-grow py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-6">
-                Dashboard
+                Olá {user?.name}, bem-vindo!
               </h1>
 
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

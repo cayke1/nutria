@@ -38,13 +38,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const _removeCookies = (): void => {
-    document.cookie =
-      "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure;";
-    document.cookie =
-      "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure;";
-  };
-
   const _removeLocalStorage = (key: string): void => {
     if (typeof window !== "undefined") {
       localStorage.removeItem(key);
@@ -57,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storedToken = _getLocalStorage("access_token");
         const storedUser = _getLocalStorage("user");
 
-        if (storedToken && storedUser) {
+        if (storedToken && storedUser && !user && !token) {
           setToken(storedToken);
           try {
             const parsedUser = JSON.parse(storedUser);
@@ -76,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     loadUserData();
-  });
+  }, [user, token]);
 
   const register = async (name: string, email: string): Promise<boolean> => {
     try {
@@ -129,8 +122,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
-        setToken(data.token);
-        _setLocalStorage("access_token", data.token);
+        setToken(data.session.token);
+        _setLocalStorage("access_token", data.session.token);
         _setLocalStorage("user", JSON.stringify(data.user));
         push("/dashboard");
       } else {
@@ -141,11 +134,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await fetch("/api/user/logout", {
+      method: "POST",
+    });
     setUser(null);
     setToken(null);
     _removeLocalStorage("access_token");
-    _removeCookies();
     _removeLocalStorage("user");
     push("/auth/login");
   };

@@ -20,7 +20,10 @@ export async function POST(req: NextRequest) {
       token: generateToken({ userId: userExists._id as string, code }),
     });
 
-    const response = NextResponse.json(session, { status: 201 });
+    const response = NextResponse.json(
+      { user: userExists, session },
+      { status: 201 }
+    );
     response.cookies.set("access_token", session.token, {
       path: "/",
       maxAge: 60 * 60 * 24,
