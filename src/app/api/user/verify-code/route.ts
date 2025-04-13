@@ -19,7 +19,33 @@ export async function POST(req: NextRequest) {
       userId: userExists._id,
       token: generateToken({ userId: userExists._id as string, code }),
     });
-    return NextResponse.json(session, { status: 201 });
+
+    const response = NextResponse.json(session, { status: 201 });
+    response.cookies.set("access_token", session.token, {
+      path: "/",
+      maxAge: 60 * 60 * 24,
+      sameSite: "lax",
+      secure: true,
+      httpOnly: false,
+    });
+
+    response.cookies.set("user_id", userExists._id, {
+      path: "/",
+      maxAge: 60 * 60 * 24,
+      sameSite: "lax",
+      secure: true,
+      httpOnly: true,
+    });
+
+    response.cookies.set("session_id", session._id, {
+      path: "/",
+      maxAge: 60 * 60 * 24,
+      sameSite: "lax",
+      secure: true,
+      httpOnly: true,
+    });
+
+    return response;
   } catch (error) {
     console.log(error);
     return responseError(500, "Error creating session");

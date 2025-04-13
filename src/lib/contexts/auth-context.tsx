@@ -38,6 +38,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const _removeCookies = (): void => {
+    document.cookie =
+      "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure;";
+    document.cookie =
+      "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure;";
+  };
+
   const _removeLocalStorage = (key: string): void => {
     if (typeof window !== "undefined") {
       localStorage.removeItem(key);
@@ -138,6 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setToken(null);
     _removeLocalStorage("access_token");
+    _removeCookies();
     _removeLocalStorage("user");
     push("/auth/login");
   };
@@ -160,9 +168,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
