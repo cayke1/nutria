@@ -1,37 +1,43 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
+
+const publicRoutes = [
+  { path: "/auth/login", whenAuthenticated: "redirect" },
+  { path: "/auth/register", whenAuthenticated: "redirect" },
+  { path: "/", whenAuthenticated: "next" },
+] as const;
+
+const redirect_when_not_authenticated = "/auth/login";
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const isPublicPath = pathname.startsWith("/(public)") || pathname === "/";
-  const isPrivatePath = pathname.startsWith("/(private)");
-  const normalizedPath = pathname
-    .replace("/(public)", "")
-    .replace("/(private)", "");
+  const path = request.nextUrl.pathname;
+  const publicRoute = publicRoutes.find((route) => route.path === path);
+  const token = checkAuth(request);
 
-  if (isPrivatePath) {
-    const isAuthenticated = true; //checkAuth(request);
-
-    if (!isAuthenticated) {
-      const loginUrl = new URL("/login", request.url);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    return NextResponse.rewrite(new URL(normalizedPath || "/", request.url));
+  if (!token && publicRoute) {
+    return NextResponse.next();
   }
 
-  if (isPublicPath) {
-    return NextResponse.rewrite(new URL(normalizedPath || "/", request.url));
+  if (!token && !publicRoute) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = redirect_when_not_authenticated;
+
+    return NextResponse.redirect(redirectUrl);
   }
+
+  if (token && publicRoute && publicRoute.whenAuthenticated === "redirect") {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/dashboard";
+
+    return NextResponse.redirect(redirectUrl);
+  }
+
   return NextResponse.next();
 }
 function checkAuth(request: NextRequest): boolean {
-  // Example: Check for a token in cookies or headers
-  const token = request.cookies.get("auth_token")?.value;
-  return !!token; // Return true if token exists, false otherwise
+  const token = request.cookies.get("access_token")?.value;
+  return !!token;
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)", // Apply to all routes except static files and API
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
