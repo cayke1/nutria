@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Edit2, Trash2, Coffee, Sun, Moon, Utensils } from "lucide-react";
+import { Edit2, Trash2, Coffee, Sun, Moon, Utensils, Star } from "lucide-react";
 import { Meal, mealTypeLabels } from "@/@types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +9,17 @@ interface MealCardProps {
   meal: Meal;
   onEdit: (meal: Meal) => void;
   onDelete: (mealId: string) => void;
+  onSetFav: (mealId: string) => void;
+  onSetUnFav: (mealId: string) => void;
 }
 
-export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
+export function MealCard({
+  meal,
+  onEdit,
+  onDelete,
+  onSetFav,
+  onSetUnFav,
+}: MealCardProps) {
   const mealTypeIcons = {
     breakfast: Sun,
     lunch: Utensils,
@@ -67,6 +75,25 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
               className="h-8 w-8 text-gray-500 hover:text-red-600"
             >
               <Trash2 size={16} />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (!meal.isUserFavorite) onSetFav(meal._id);
+                else onSetUnFav(meal._id);
+              }}
+              className="group h-8 w-8 text-gray-500 hover:text-yellow-300"
+            >
+              <Star
+                size={16}
+                className={`${
+                  meal.isUserFavorite
+                    ? "fill-current text-yellow-300"
+                    : "fill-none group-hover:fill-current"
+                }`}
+              />
             </Button>
           </div>
         </div>

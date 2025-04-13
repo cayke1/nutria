@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format } from "date-fns";
-import { CalendarIcon, Clock } from "lucide-react";
+import { format, parse } from "date-fns";
+import { Clock } from "lucide-react";
 import { Meal, MealType, mealTypeLabels } from "@/@types";
+
 import {
   Form,
   FormControl,
@@ -23,14 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/contexts/auth-context";
+import { DateInput, KcalInput } from "../helpers/InputMask";
+import { stringToDate } from "@/lib/utils/stringToDate";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres" }),
@@ -40,11 +37,11 @@ const formSchema = z.object({
   calories: z
     .number()
     .min(1, { message: "Calorias deve ser um número positivo" }),
-  date: z.date(),
+  date: z.string(),
   time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: "Formato inválido. Use HH:MM",
   }),
-  type: z.enum(["breakfast", "lunch", "snack", "dinner"] as const),
+  type: z.enum(["breakfast", "lunch", "snack", "dinner"]),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -53,9 +50,12 @@ interface MealFormProps {
   meal?: Meal;
   onSubmit: (meal: Omit<Meal, "_id">) => void;
   onCancel: () => void;
+  repeat?: boolean;
 }
 
-export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
+export function MealForm({ meal, onSubmit, onCancel, repeat }: MealFormProps) {
+  const { user } = useAuth();
+
   const [date, setDate] = useState<Date | undefined>(
     meal ? new Date(meal.dateTime) : undefined
   );
@@ -64,7 +64,9 @@ export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
     name: meal?.name || "",
     description: meal?.description || "",
     calories: meal?.calories || 0,
-    date: meal ? new Date(meal.dateTime) : new Date(),
+    date: meal
+      ? format(new Date(meal.dateTime), "dd/MM/yyyy")
+      : format(new Date(), "dd/MM/yyyy"),
     time: meal?.dateTime
       ? format(meal.dateTime, "HH:mm")
       : format(new Date(), "HH:mm"),
@@ -79,7 +81,7 @@ export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
   const handleSubmit = (values: FormValues) => {
     try {
       const [hours, minutes] = values.time.split(":").map(Number);
-      const dateTime = new Date(values.date);
+      const dateTime = stringToDate(values.date);
       dateTime.setHours(hours, minutes);
 
       onSubmit({
@@ -88,14 +90,13 @@ export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
         calories: values.calories,
         dateTime: dateTime.toISOString(),
         type: values.type,
-        createdAt: new Date(Date.now()).toISOString(),
-        updatedAt: new Date(Date.now()).toISOString(),
+        userId: user!._id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       });
 
       toast.success(meal ? "Refeição atualizada" : "Refeição adicionada", {
-        description: `${values.name} foi ${
-          meal ? "atualizada" : "adicionada"
-        } com sucesso.`,
+        description: `${values.name} foi ${meal ? "atualizada" : "adicionada"} com sucesso.`,
       });
     } catch (error) {
       toast.error("Ocorreu um erro ao salvar a refeição.");
@@ -145,17 +146,23 @@ export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
             <FormItem>
               <FormLabel>Calorias</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
+                <KcalInput
                   placeholder="0"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  value={field.value.toString()}
+                  onChange={(value) => {
+                    const parsedValue = parseInt(value.replace(/\D/g, ""), 10);
+                    field.onChange(isNaN(parsedValue) ? 0 : parsedValue);
+                  }}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        <h2 className="text-lg font-semibold text-gray-800">
+          Data e hora da refeição
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
@@ -164,38 +171,9 @@ export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Data</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "dd/MM/yyyy")
-                        ) : (
-                          <span>Escolha uma data</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={(date) => {
-                        date && field.onChange(date);
-                        setDate(date);
-                      }}
-                      initialFocus
-                      className={cn("p-3 pointer-events-auto")}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <FormControl>
+                  <DateInput {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -249,7 +227,8 @@ export function MealForm({ meal, onSubmit, onCancel }: MealFormProps) {
             Cancelar
           </Button>
           <Button type="submit" className="bg-nutria-500 hover:bg-nutria-600">
-            {meal ? "Atualizar" : "Adicionar"} Refeição
+            {meal ? (repeat ? "Re-cadastrar" : "Atualizar") : "Adicionar"}{" "}
+            Refeição
           </Button>
         </div>
       </form>

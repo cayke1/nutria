@@ -9,99 +9,55 @@ import { CaloriesCard } from "@/components/dashboard/CaloriesCard";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import { useAuth } from "@/lib/contexts/auth-context";
+import { useMeal } from "@/lib/contexts/meal-context";
+import { TestPopover } from "@/components/meals/test";
 
 export default function Dashboard() {
   const { user, token } = useAuth();
-  const [meals, setMeals] = useState<Meal[] | null>(null);
+  const {
+    handleAddMeal,
+    handleDeleteMeal,
+    handleAddAsFav,
+    handleRemoveAsFav,
+    handleUpdateMeal,
+    meals,
+    favorites,
+    isLoading: isLoadingMeals,
+  } = useMeal();
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchMeals = async () => {
-    if (!isLoading) setIsLoading(true);
-    const res = await fetch("/api/meal/getAll");
-
-    if (!res.ok) {
-      console.log(res);
-      toast.error("Erro ao buscar refeições", {
-        description: "Não foi possível carregar as refeições.",
-      });
-      return;
-    }
-
-    const data = await res.json();
-    setMeals(data);
-    setIsLoading(false);
-  };
   useEffect(() => {
-    if (isLoading) fetchMeals();
-  }, [meals, isLoading]);
-
-  const handleAddMeal = async (newMeal: Omit<Meal, "_id">) => {
-    try {
-      const res = await fetch("/api/meal/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...newMeal,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Error creating meal");
-
-      fetchMeals();
-      toast.success("Refeição criada com sucesso");
-    } catch (error) {
-      console.error("Error creating meal:", error);
-      toast.error("Erro ao criar refeição", {
-        description: "Não foi possível criar a refeição.",
-      });
+    if (isLoadingMeals) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
     }
+  }, [isLoadingMeals]);
+
+  const addMeal = async (meal: Omit<Meal, "_id">) => {
+    if (!token) return;
+    const newMeal = { ...meal, _id: uuidv4() };
+    await handleAddMeal(newMeal, token);
   };
 
-  const handleUpdateMeal = async (
-    mealId: string,
-    updatedMeal: Omit<Meal, "_id">
-  ) => {
-    const res = await fetch(`/api/meal/update/${mealId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        ...updatedMeal,
-      }),
-    });
-
-    if (!res.ok) {
-      console.log(res);
-      toast.error("Erro ao atualizar refeição", {
-        description: "Não foi possível atualizar a refeição.",
-      });
-      return;
-    }
-    fetchMeals();
+  const updateMeal = async (mealId: string, updatedMeal: Omit<Meal, "_id">) => {
+    if (!token) return;
+    await handleUpdateMeal(mealId, updatedMeal, token);
   };
 
-  const handleDeleteMeal = async (mealId: string) => {
-    try {
-      const res = await fetch(`/api/meal/delete/${mealId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) throw new Error("Error deleting meal");
+  const deleteMeal = async (mealId: string) => {
+    if (!token) return;
+    await handleDeleteMeal(mealId, token);
+  };
 
-      fetchMeals();
-    } catch (error) {
-      console.error("Error deleting meal:", error);
-      toast.error("Erro ao deletar refeição", {
-        description: "Não foi possível deletar a refeição.",
-      });
-    }
+  const setFavMeal = async (mealId: string) => {
+    if (!token) return;
+    await handleAddAsFav(mealId, token);
+  };
+
+  const setUnFavMeal = async (mealId: string) => {
+    if (!token) return;
+    await handleRemoveAsFav(mealId, token);
   };
 
   return (
@@ -124,10 +80,13 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-3">
                   <MealList
+                    favorites={favorites ? favorites : []}
                     meals={meals ? meals : []}
-                    onAddMeal={handleAddMeal}
-                    onUpdateMeal={handleUpdateMeal}
-                    onDeleteMeal={handleDeleteMeal}
+                    onAddMeal={addMeal}
+                    onUpdateMeal={updateMeal}
+                    onDeleteMeal={deleteMeal}
+                    onSetFavoriteMeal={setFavMeal}
+                    onSetUnfavoriteMeal={setUnFavMeal}
                   />
                 </div>
 
@@ -140,6 +99,8 @@ export default function Dashboard() {
           <Footer />
         </div>
       )}
+
+      <TestPopover />
     </>
   );
 }

@@ -1,5 +1,4 @@
-
-export type MealType = 'breakfast' | 'lunch' | 'snack' | 'dinner';
+export type MealType = "breakfast" | "lunch" | "snack" | "dinner";
 
 export interface Meal {
   _id: string;
@@ -10,19 +9,20 @@ export interface Meal {
   updatedAt: string;
   dateTime: string;
   userId: string;
+  isUserFavorite?: boolean;
   type: MealType;
 }
 
 export const mealTypeLabels: Record<MealType, string> = {
-  breakfast: 'Café da manhã',
-  lunch: 'Almoço',
-  snack: 'Lanche da tarde',
-  dinner: 'Janta',
+  breakfast: "Café da manhã",
+  lunch: "Almoço",
+  snack: "Lanche da tarde",
+  dinner: "Janta",
 };
 
 export const mealTypeIcons: Record<MealType, string> = {
-  breakfast: 'sun',
-  lunch: 'utensils',
-  snack: 'coffee',
-  dinner: 'moon',
+  breakfast: "sun",
+  lunch: "utensils",
+  snack: "coffee",
+  dinner: "moon",
 };

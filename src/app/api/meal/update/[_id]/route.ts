@@ -19,7 +19,7 @@ export async function PATCH(
   if (userId instanceof NextResponse) {
     return userId;
   }
-  const { name, description, calories, dateTime, type } = body;
+  const { name, description, calories, dateTime, type, isUserFavorite } = body;
   const { _id } = await params;
 
   try {
@@ -39,6 +39,7 @@ export async function PATCH(
       calories,
       dateTime,
       type,
+      isUserFavorite,
     });
 
     return NextResponse.json(meal, { status: 200 });

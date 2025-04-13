@@ -17,12 +17,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MealForm } from "@/components/meals/MealForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { FavoriteMeal } from "../meals/FavoriteMeal";
 
 interface MealListProps {
   meals: Meal[];
+  favorites: Meal[];
   onAddMeal: (meal: Omit<Meal, "_id">) => void;
   onUpdateMeal: (mealId: string, meal: Omit<Meal, "_id">) => void;
   onDeleteMeal: (mealId: string) => void;
+  onSetFavoriteMeal: (mealId: string) => void;
+  onSetUnfavoriteMeal: (mealId: string) => void;
 }
 
 export function MealList({
@@ -30,6 +35,9 @@ export function MealList({
   onAddMeal,
   onUpdateMeal,
   onDeleteMeal,
+  onSetFavoriteMeal,
+  onSetUnfavoriteMeal,
+  favorites,
 }: MealListProps) {
   const [selectedMealType, setSelectedMealType] = useState<string>("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -113,6 +121,8 @@ export function MealList({
                 meal={meal}
                 onEdit={handleEdit}
                 onDelete={onDeleteMeal}
+                onSetFav={onSetFavoriteMeal}
+                onSetUnFav={onSetUnfavoriteMeal}
               />
             ))}
           </div>
@@ -121,17 +131,43 @@ export function MealList({
 
       {/* Add Meal Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Adicionar Nova Refeição</DialogTitle>
-          </DialogHeader>
-          <MealForm
-            onSubmit={(meal) => {
-              onAddMeal(meal);
-              setIsAddDialogOpen(false);
-            }}
-            onCancel={() => setIsAddDialogOpen(false)}
-          />
+        <DialogContent className="sm:max-w-[500px] p-8">
+          <Tabs defaultValue="add-new" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="add-new">Adicionar Refeição</TabsTrigger>
+              <TabsTrigger value="select-fav">
+                Selecionar dos Favoritos
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="add-new">
+              <DialogHeader>
+                <DialogTitle className="mt-4">Adicionar Nova Refeição</DialogTitle>
+              </DialogHeader>
+              <MealForm
+                onSubmit={(meal) => {
+                  onAddMeal(meal);
+                  setIsAddDialogOpen(false);
+                }}
+                onCancel={() => setIsAddDialogOpen(false)}
+              />
+            </TabsContent>
+
+            <TabsContent value="select-fav">
+              <DialogHeader>
+                <DialogTitle className="mt-4">
+                  Selecionar dos Favoritos
+                </DialogTitle>
+              </DialogHeader>
+              <FavoriteMeal
+                favorites={favorites}
+                setIsAddDialogOpen={setIsAddDialogOpen}
+                handleAddMeal={(data) => {
+                  console.log(data);
+                }}
+              />
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
 

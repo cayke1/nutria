@@ -10,6 +10,7 @@ const mealSchema = new Schema({
     ref: "User",
     required: true,
   },
+  isUserFavorite: { type: Boolean, default: false },
   type: {
     type: String,
     enum: ["breakfast", "lunch", "snack", "dinner"],
