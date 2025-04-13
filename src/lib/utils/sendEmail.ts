@@ -8,7 +8,7 @@ export async function sendEmail(
   const resend = new Resend(process.env.RESEND_API_KEY!);
   const subject = "Seu código de verificação";
   const { data, error } = await resend.emails.send({
-    from: 'Acme <onboarding@resend.dev>',
+    from: process.env.EMAIL_FROM!,
     to: [email],
     subject,
     react: VerifyEmailTemplate({

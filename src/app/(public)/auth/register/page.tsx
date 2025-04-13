@@ -19,8 +19,10 @@ import {
 import { MailCheck, ArrowRight, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/contexts/auth-context";
 
 export default function Page() {
+  const { register, verifyCode } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -34,25 +36,19 @@ export default function Page() {
     if (!name) return;
 
     setIsLoading(true);
-    try {
-      const res = await fetch("/api/user/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-        }),
+    setIsLoading(true);
+    const res = await register(name, email);
+    if (res) {
+      toast.success("Código enviado com sucesso", {
+        description: "Verifique seu email para o código de verificação.",
       });
-      if (res.ok) setIsCodeSent(true);
-    } catch (error) {
-      console.error("Error creating user:", error);
-      toast.error("Erro ao criar usuário", {
-        description: "Não foi possível criar o usuário.",
-      });
+      setIsCodeSent(true);
+      setIsLoading(false);
       return;
     }
+    toast.error("Erro ao enviar código", {
+      description: "Não foi possível enviar o código para seu email.",
+    });
     setIsLoading(false);
   };
 
@@ -62,33 +58,8 @@ export default function Page() {
 
     setIsLoading(true);
 
-    try {
-      const res = await fetch("/api/user/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          code: verificationCode,
-        }),
-      });
-
-      if (!res.ok) {
-        toast.error("Erro ao verificar código", {
-          description: "Código inválido ou expirado.",
-        });
-        return;
-      }
-      const data = await res.json();
-      console.log(data);
-    } catch (error) {
-      console.error("Error verifying code:", error);
-      toast.error("Erro ao verificar código", {
-        description: "Não foi possível verificar o código.",
-      });
-      return;
-    }
+    await verifyCode(email, verificationCode);
+    return;
   };
 
   return (
