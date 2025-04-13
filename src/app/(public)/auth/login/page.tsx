@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,8 +19,10 @@ import {
 import { MailCheck, ArrowRight, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/contexts/auth-context";
 
 export default function Page() {
+  const { requestCode, verifyCode } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [isCodeSent, setIsCodeSent] = useState(false);
@@ -33,14 +35,19 @@ export default function Page() {
 
     setIsLoading(true);
 
-    // This would be an API call in a real app
-    setTimeout(() => {
-      setIsCodeSent(true);
+    const res = await requestCode(email);
+    if (res) {
       setIsLoading(false);
-
+      setIsCodeSent(true);
       toast.success("Código enviado", {
         description: `Um código de verificação foi enviado para ${email}`,
       });
+      return;
+    }
+
+    setIsLoading(false);
+    toast.error("Erro ao enviar o código", {
+      description: "Verifique se o email está correto",
     });
   };
 
@@ -50,16 +57,7 @@ export default function Page() {
 
     setIsLoading(true);
 
-    // This would be an API call in a real app
-    setTimeout(() => {
-      setIsLoading(false);
-
-      toast("Login realizado com sucesso", {
-        description: "Bem-vindo ao Nutria!",
-      });
-
-      router.push("/dashboard");
-    }, 1500);
+    await verifyCode(email, verificationCode);
   };
 
   return (
