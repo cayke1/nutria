@@ -11,7 +11,7 @@ import { Loader } from "lucide-react";
 import { useAuth } from "@/lib/contexts/auth-context";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [meals, setMeals] = useState<Meal[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -41,6 +41,7 @@ export default function Dashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           ...newMeal,
@@ -67,6 +68,7 @@ export default function Dashboard() {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         ...updatedMeal,
@@ -87,6 +89,9 @@ export default function Dashboard() {
     try {
       const res = await fetch(`/api/meal/delete/${mealId}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (!res.ok) throw new Error("Error deleting meal");
 
@@ -107,15 +112,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {!isLoading && meals?.length === 0 && (
-        <div className="flex h-screen w-full items-center justify-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Nenhuma refeição encontrada
-          </h1>
-        </div>
-      )}
-
-      {!isLoading && meals && meals.length > 0 && (
+      {!isLoading && (
         <div className="min-h-screen flex flex-col">
           <Navbar />
           <main className="flex-grow py-8">
@@ -127,7 +124,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-3">
                   <MealList
-                    meals={meals}
+                    meals={meals ? meals : []}
                     onAddMeal={handleAddMeal}
                     onUpdateMeal={handleUpdateMeal}
                     onDeleteMeal={handleDeleteMeal}
@@ -135,7 +132,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="lg:col-span-1">
-                  <CaloriesCard meals={meals} />
+                  <CaloriesCard meals={meals ? meals : []} />
                 </div>
               </div>
             </div>

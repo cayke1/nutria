@@ -5,6 +5,11 @@ const mealSchema = new Schema({
   description: String,
   calories: { type: Number, required: true },
   dateTime: { type: String, required: true },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   type: {
     type: String,
     enum: ["breakfast", "lunch", "snack", "dinner"],

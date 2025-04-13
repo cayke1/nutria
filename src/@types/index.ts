@@ -9,6 +9,7 @@ export interface Meal {
   createdAt: string;
   updatedAt: string;
   dateTime: string;
+  userId: string;
   type: MealType;
 }
 
