@@ -30,9 +30,7 @@ export default function Dashboard() {
     isLoading: isLoadingMeals,
   } = useMeal();
   const [isLoading, setIsLoading] = useState(true);
-  const [showDialog, setShowDialog] = useState(
-    user?.calorieTarget ? false : true
-  );
+  const [showDialog, setShowDialog] = useState(false);
   const [kcalTarget, setKcalTarget] = useState<string>("");
 
   useEffect(() => {
@@ -41,7 +39,13 @@ export default function Dashboard() {
     } else {
       setIsLoading(false);
     }
-  }, [isLoadingMeals]);
+
+    if (user) {
+      if (!user.calorieTarget) {
+        setShowDialog(true);
+      }
+    }
+  }, [isLoadingMeals, user]);
 
   const addMeal = async (meal: Omit<Meal, "_id">) => {
     if (!token) return;
