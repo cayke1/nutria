@@ -55,10 +55,16 @@ interface MealFormProps {
 
 export function MealForm({ meal, onSubmit, onCancel, repeat }: MealFormProps) {
   const { user } = useAuth();
-
-  const [date, setDate] = useState<Date | undefined>(
-    meal ? new Date(meal.dateTime) : undefined
-  );
+  const userAction = {
+    add: "Adicionada",
+    update: "Atualizada",
+    repeat: "Re-cadastrada",
+  } as const;
+  const action = meal
+    ? repeat
+      ? userAction.repeat
+      : userAction.update
+    : userAction.add;
 
   const defaultValues: FormValues = {
     name: meal?.name || "",
@@ -95,8 +101,8 @@ export function MealForm({ meal, onSubmit, onCancel, repeat }: MealFormProps) {
         updatedAt: new Date().toISOString(),
       });
 
-      toast.success(meal ? "Refeição atualizada" : "Refeição adicionada", {
-        description: `${values.name} foi ${meal ? "atualizada" : "adicionada"} com sucesso.`,
+      toast.success(values.name + " " + action + " com sucesso!", {
+        description: "A refeição foi salva com sucesso.",
       });
     } catch (error) {
       toast.error("Ocorreu um erro ao salvar a refeição.");

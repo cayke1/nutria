@@ -56,6 +56,7 @@ export function MealProvider({ children }: { children: React.ReactNode }) {
 
   const handleAddMeal = async (newMeal: Omit<Meal, "_id">, token: string) => {
     try {
+      console.log(newMeal, token);
       const res = await fetch("/api/meal/create", {
         method: "POST",
         headers: {

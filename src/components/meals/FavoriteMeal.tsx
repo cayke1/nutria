@@ -9,18 +9,18 @@ import {
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { MealForm } from "./MealForm";
+import { useMeal } from "@/lib/contexts/meal-context";
 
 interface FavoriteMealProps {
   favorites: Meal[];
   setIsAddDialogOpen: (isOpen: boolean) => void;
-  handleAddMeal: (meal: Meal) => void;
 }
 
 export function FavoriteMeal({
   favorites,
   setIsAddDialogOpen,
-  handleAddMeal,
 }: FavoriteMealProps) {
+  const { handleAddMeal } = useMeal();
   const [step, setStep] = useState(0);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 
@@ -29,19 +29,22 @@ export function FavoriteMeal({
     if (meal) setSelectedMeal(meal);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (step === 0) {
-      setStep(1);
-    } else if (step === 1 && selectedMeal) {
-      // Você pode montar um objeto com { ...selectedMeal, date, time } se quiser
-      handleAddMeal(selectedMeal);
-      setIsAddDialogOpen(false);
-    }
+  const handleRecreateMeal = (meal: Omit<Meal, "_id">) => {
+    console.log("Reacreate meal", meal);
+    handleAddMeal(meal, localStorage.getItem("access_token") || "");
   };
 
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (step === 0) {
+  //     setStep(1);
+  //   } else if (step === 1 && selectedMeal) {
+  //     setIsAddDialogOpen(false);
+  //   }
+  // };
+
   return (
-    <form onSubmit={handleSubmit}>
+    <>
       {step === 0 && favorites && favorites.length > 0 && (
         <Select onValueChange={handleSelectChange}>
           <SelectTrigger className="w-full sm:w-[180px] mt-4">
@@ -71,7 +74,9 @@ export function FavoriteMeal({
           onCancel={() => {
             setIsAddDialogOpen(false);
           }}
-          onSubmit={() => {}}
+          onSubmit={(meal) => {
+            handleRecreateMeal(meal);
+          }}
           repeat
         />
       )}
@@ -85,9 +90,16 @@ export function FavoriteMeal({
           >
             Cancelar
           </Button>
-          <Button className="bg-nutria-500 hover:bg-nutria-600">Próximo</Button>
+          <Button
+            className="bg-nutria-500 hover:bg-nutria-600"
+            onClick={() => {
+              setStep(step + 1);
+            }}
+          >
+            Próximo
+          </Button>
         </div>
       )}
-    </form>
+    </>
   );
 }

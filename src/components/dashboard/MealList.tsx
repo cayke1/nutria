@@ -142,7 +142,9 @@ export function MealList({
 
             <TabsContent value="add-new">
               <DialogHeader>
-                <DialogTitle className="mt-4">Adicionar Nova Refeição</DialogTitle>
+                <DialogTitle className="mt-4">
+                  Adicionar Nova Refeição
+                </DialogTitle>
               </DialogHeader>
               <MealForm
                 onSubmit={(meal) => {
@@ -162,9 +164,6 @@ export function MealList({
               <FavoriteMeal
                 favorites={favorites}
                 setIsAddDialogOpen={setIsAddDialogOpen}
-                handleAddMeal={(data) => {
-                  console.log(data);
-                }}
               />
             </TabsContent>
           </Tabs>
