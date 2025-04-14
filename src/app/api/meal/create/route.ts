@@ -2,6 +2,7 @@ import { connectDb } from "@/lib/database";
 import { Meal } from "@/lib/models/Meal";
 import { checkSessionHelper } from "@/lib/utils/checkSessionHelper";
 import { responseError } from "@/lib/utils/responseError";
+import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
       updatedAt,
       dateTime,
       type,
-      userId: userId,
+      userId: new Types.ObjectId(userId),
     });
     return NextResponse.json(newMeal, { status: 201 });
   } catch (error) {

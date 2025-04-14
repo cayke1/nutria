@@ -3,6 +3,7 @@ import { Meal } from "@/lib/models/Meal";
 import { responseError } from "@/lib/utils/responseError";
 import { NextRequest, NextResponse } from "next/server";
 import { checkSessionHelper } from "@/lib/utils/checkSessionHelper";
+import { Types } from "mongoose";
 
 export async function GET(req: NextRequest) {
   await connectDb();
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const meals = await Meal.find({
-      userId: userId,
+      userId: new Types.ObjectId(userId),
     });
     return NextResponse.json(meals);
   } catch (error) {
