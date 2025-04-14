@@ -4,6 +4,7 @@ import { Meal, mealTypeLabels } from "@/@types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { isToday } from "@/lib/utils/isToday";
 
 interface MealCardProps {
   meal: Meal;
@@ -26,7 +27,7 @@ export function MealCard({
     snack: Coffee,
     dinner: Moon,
   };
-  const isTodayMeal = new Date(meal.dateTime) < new Date(Date.now() + 86400000);
+  const isTodayMeal = isToday(meal.dateTime);
   const Icon = mealTypeIcons[meal.type];
 
   return (
