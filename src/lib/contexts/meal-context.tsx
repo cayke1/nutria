@@ -67,7 +67,7 @@ export function MealProvider({ children }: { children: React.ReactNode }) {
 
       if (!res.ok) throw new Error("Error creating meal");
 
-      fetchMeals();
+      hardFetch();
       toast.success("Refeição criada com sucesso");
     } catch (error) {
       console.error("Error creating meal:", error);
@@ -100,7 +100,7 @@ export function MealProvider({ children }: { children: React.ReactNode }) {
       });
       return;
     }
-    fetchMeals();
+    hardFetch();
   };
 
   const handleDeleteMeal = async (mealId: string, token: string) => {
@@ -113,7 +113,7 @@ export function MealProvider({ children }: { children: React.ReactNode }) {
       });
       if (!res.ok) throw new Error("Error deleting meal");
 
-      fetchMeals();
+      hardFetch();
     } catch (error) {
       console.error("Error deleting meal:", error);
       toast.error("Erro ao deletar refeição", {
