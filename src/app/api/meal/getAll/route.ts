@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
   if (userId instanceof NextResponse) {
     return userId;
   }
+
   try {
     const meals = await Meal.find({
       userId: userId,

@@ -23,5 +23,5 @@ export async function checkSessionHelper(
     return responseError(401, "Sessão não encontrada");
   }
 
-  return userExists._id.toString();
+  return userExists._id;
 }
