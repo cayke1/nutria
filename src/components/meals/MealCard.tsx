@@ -31,7 +31,7 @@ export function MealCard({
   const Icon = mealTypeIcons[meal.type];
 
   return (
-    <Card className={`w-full ${isTodayMeal ? "opacity-50" : ""}`}>
+    <Card className={`w-full ${isTodayMeal ? "" : "opacity-50"}`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center">

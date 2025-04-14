@@ -41,8 +41,13 @@ export default function Dashboard() {
     }
 
     if (user) {
-      if (!user.calorieTarget) {
-        setShowDialog(true);
+      const neverShowCalorieTarget = localStorage.getItem(
+        "neverShowCalorieTarget"
+      );
+      if (!neverShowCalorieTarget) {
+        if (!user.calorieTarget) {
+          setShowDialog(true);
+        }
       }
     }
   }, [isLoadingMeals, user]);
@@ -74,6 +79,11 @@ export default function Dashboard() {
 
   const handleAddCalorieTarget = async () => {
     await setCalorieTarget(Number(kcalTarget.replace(/\D/g, "")));
+    setShowDialog(false);
+  };
+
+  const handleNeverShowAgain = async () => {
+    localStorage.setItem("neverShowCalorieTarget", "true");
     setShowDialog(false);
   };
 
@@ -131,12 +141,18 @@ export default function Dashboard() {
                   value={kcalTarget}
                   onChange={setKcalTarget}
                 />
-                <div className="flex justify-center mt-4">
+                <div className="flex flex-col gap-4 justify-center mt-4">
                   <Button
                     onClick={handleAddCalorieTarget}
                     className="w-full bg-green-500 hover:bg-green-600 text-white"
                   >
                     Adicionar Meta
+                  </Button>
+                  <Button
+                    onClick={handleNeverShowAgain}
+                    className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700"
+                  >
+                    Não exibir novamente
                   </Button>
                 </div>
               </div>
