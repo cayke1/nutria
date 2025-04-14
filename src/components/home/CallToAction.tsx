@@ -20,7 +20,7 @@ export function CallToAction() {
               size="lg"
               className="bg-white text-nutria-600 hover:bg-nutria-50"
             >
-              <Link href="/dashboard">
+              <Link href="/auth/register">
                 Comece agora
                 <ChevronRight size={16} className="ml-2" />
               </Link>

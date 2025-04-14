@@ -30,9 +30,6 @@ export function MealProvider({ children }: { children: React.ReactNode }) {
 
     if (!res.ok) {
       console.log(res);
-      toast.error("Erro ao buscar refeições", {
-        description: "Não foi possível carregar as refeições.",
-      });
       return;
     }
 

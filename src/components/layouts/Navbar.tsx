@@ -62,20 +62,13 @@ export function Navbar() {
             >
               Início
             </Link>
-            <Link
-              href="/dashboard"
-              className="text-gray-700 hover:text-nutria-600 block px-3 py-2 rounded-md text-base font-medium"
-              onClick={() => setIsOpen(false)}
-            >
-              Dashboard
-            </Link>
             <Button
               asChild
               variant="default"
               className="w-full mt-2 bg-nutria-500 hover:bg-nutria-600"
               onClick={() => setIsOpen(false)}
             >
-              <Link href="/dashboard">Acessar</Link>
+              <Link href="/auth/login">Acessar</Link>
             </Button>
           </div>
         </div>

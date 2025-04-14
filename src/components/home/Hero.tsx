@@ -19,7 +19,7 @@ export function Hero() {
               </p>
               <div className="mt-8 flex flex-wrap space-y-4 sm:space-y-0 sm:space-x-4">
                 <Button asChild size="lg" className="bg-nutria-500 hover:bg-nutria-600 text-white">
-                  <Link href="/dashboard">
+                  <Link href="/auth/register">
                     Começar agora
                     <ChevronRight size={16} className="ml-2" />
                   </Link>
