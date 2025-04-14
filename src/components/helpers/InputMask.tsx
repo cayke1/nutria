@@ -88,77 +88,76 @@ type KcalInputProps = {
   onBlur?: () => void;
 };
 
-export const KcalInput = forwardRef<HTMLInputElement, KcalInputProps>((props, ref) => {
-  const {
-    value,
-    onChange,
-    name,
-    id = "kcal-input",
-    placeholder = "Enter calories",
-    disabled,
-    className,
-    onBlur,
-    ...rest
-  } = props;
+export const KcalInput = forwardRef<HTMLInputElement, KcalInputProps>(
+  (props, ref) => {
+    const {
+      value,
+      onChange,
+      name,
+      id = "kcal-input",
+      placeholder = "Enter calories",
+      disabled,
+      className,
+      onBlur,
+      ...rest
+    } = props;
 
-  // Internal state for controlled component behavior
-  const [internalValue, setInternalValue] = useState("");
+    const [internalValue, setInternalValue] = useState("");
 
-  // Use either the passed value or internal state
-  const displayValue =
-    value !== undefined
-      ? typeof value === "number"
-        ? `${value} kcal`
-        : value
-      : internalValue;
+    const displayValue =
+      value !== undefined
+        ? typeof value === "number"
+          ? `${value} kcal`
+          : value
+        : internalValue;
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value.replace(/[^\d]/g, "");
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+      const input = e.target.value.replace(/[^\d]/g, "");
 
-    if (input.length <= 4) {
-      const numValue = parseInt(input || "0");
+      if (input.length <= 4) {
+        const numValue = parseInt(input || "0");
 
-      if (numValue <= 9999) {
-        const formatted = input ? `${input} kcal` : "";
+        if (numValue <= 9999) {
+          const formatted = input ? `${input} kcal` : "";
 
-        if (onChange) {
-          // Pass just the numeric value to the parent
-          onChange(input);
-        } else {
-          setInternalValue(formatted);
+          if (onChange) {
+            onChange(input);
+          } else {
+            setInternalValue(formatted);
+          }
         }
       }
-    }
-  };
+    };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    const currentValue = typeof displayValue === "string" ? displayValue : "";
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+      const currentValue = typeof displayValue === "string" ? displayValue : "";
 
-    if (e.key === "Backspace" && currentValue.endsWith(" kcal")) {
-      e.preventDefault();
-      const newValue = currentValue.replace(" kcal", "").slice(0, -1) || "";
+      if (e.key === "Backspace" && currentValue.endsWith(" kcal")) {
+        e.preventDefault();
+        const newValue = currentValue.replace(" kcal", "").slice(0, -1) || "";
 
-      if (onChange) {
-        onChange(newValue);
-      } else {
-        setInternalValue(newValue);
+        if (onChange) {
+          onChange(newValue);
+        } else {
+          setInternalValue(newValue);
+        }
       }
-    }
-  };
+    };
 
-  return (
-    <Input
-      ref={ref}
-      id={id}
-      name={name}
-      value={displayValue}
-      onChange={handleChange}
-      onKeyDown={handleKeyDown}
-      placeholder={placeholder}
-      disabled={disabled}
-      className={className}
-      onBlur={onBlur}
-      {...rest}
-    />
-  );
-});
+    return (
+      <Input
+        ref={ref}
+        id={id}
+        name={name}
+        value={displayValue}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        disabled={disabled}
+        className={className}
+        onBlur={onBlur}
+        {...rest}
+      />
+    );
+  }
+);

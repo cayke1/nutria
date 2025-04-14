@@ -6,6 +6,7 @@ const userSchema = new Schema({
   code: { type: String, required: false },
   createdAt: { type: String, default: Date.now },
   updatedAt: { type: String, default: Date.now },
+  calorieTarget: { type: Number, required: false },
 });
 
 userSchema.pre("save", function (next) {

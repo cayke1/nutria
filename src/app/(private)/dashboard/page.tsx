@@ -1,19 +1,24 @@
 "use client";
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { Meal } from "@/@types";
 import { Navbar } from "@/components/dashboard/layout/Navbar";
 import { Footer } from "@/components/layouts/Footer";
 import { MealList } from "@/components/dashboard/MealList";
 import { CaloriesCard } from "@/components/dashboard/CaloriesCard";
-import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import { useAuth } from "@/lib/contexts/auth-context";
 import { useMeal } from "@/lib/contexts/meal-context";
-import { TestPopover } from "@/components/meals/test";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { KcalInput } from "@/components/helpers/InputMask";
+import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
-  const { user, token } = useAuth();
+  const { user, token, setCalorieTarget } = useAuth();
   const {
     handleAddMeal,
     handleDeleteMeal,
@@ -25,6 +30,10 @@ export default function Dashboard() {
     isLoading: isLoadingMeals,
   } = useMeal();
   const [isLoading, setIsLoading] = useState(true);
+  const [showDialog, setShowDialog] = useState(
+    user?.calorieTarget ? false : true
+  );
+  const [kcalTarget, setKcalTarget] = useState<string>("");
 
   useEffect(() => {
     if (isLoadingMeals) {
@@ -36,8 +45,7 @@ export default function Dashboard() {
 
   const addMeal = async (meal: Omit<Meal, "_id">) => {
     if (!token) return;
-    const newMeal = { ...meal, _id: uuidv4() };
-    await handleAddMeal(newMeal, token);
+    await handleAddMeal(meal, token);
   };
 
   const updateMeal = async (mealId: string, updatedMeal: Omit<Meal, "_id">) => {
@@ -58,6 +66,11 @@ export default function Dashboard() {
   const setUnFavMeal = async (mealId: string) => {
     if (!token) return;
     await handleRemoveAsFav(mealId, token);
+  };
+
+  const handleAddCalorieTarget = async () => {
+    await setCalorieTarget(Number(kcalTarget.replace(/\D/g, "")));
+    setShowDialog(false);
   };
 
   return (
@@ -97,6 +110,31 @@ export default function Dashboard() {
             </div>
           </main>
           <Footer />
+
+          <Dialog open={showDialog} onOpenChange={setShowDialog}>
+            <DialogContent className="sm:max-w-md px-8">
+              <DialogHeader>
+                <DialogTitle className="text-center text-xl font-semibold">
+                  Deseja adicionar uma meta calórica diária?
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <KcalInput
+                  placeholder="Meta calórica"
+                  value={kcalTarget}
+                  onChange={setKcalTarget}
+                />
+                <div className="flex justify-center mt-4">
+                  <Button
+                    onClick={handleAddCalorieTarget}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    Adicionar Meta
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       )}
     </>

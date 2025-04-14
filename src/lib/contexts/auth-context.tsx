@@ -6,6 +6,7 @@ interface User {
   name: string;
   email: string;
   code?: string;
+  calorieTarget?: number;
 }
 
 interface AuthContextType {
@@ -16,6 +17,7 @@ interface AuthContextType {
   requestCode: (email: string) => Promise<boolean>;
   verifyCode: (email: string, code: string) => Promise<void>;
   logout: () => void;
+  setCalorieTarget: (calorieTarget: number) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -89,6 +91,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const setCalorieTarget = async (calorieTarget: number): Promise<boolean> => {
+    try {
+      const res = await fetch("/api/user/set-target", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ calorieTarget }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      return false;
+    }
+  };
+
   const requestCode = async (email: string): Promise<boolean> => {
     try {
       const res = await fetch("/api/user/request-code", {
@@ -153,6 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         requestCode,
         verifyCode,
         logout,
+        setCalorieTarget,
       }}
     >
       {children}
