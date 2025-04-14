@@ -46,28 +46,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    const loadUserData = () => {
-      try {
-        const storedToken = _getLocalStorage("access_token");
-        const storedUser = _getLocalStorage("user");
+  const loadUserData = () => {
+    try {
+      const storedToken = _getLocalStorage("access_token");
+      const storedUser = _getLocalStorage("user");
 
-        if (storedToken && storedUser && !user && !token) {
-          setToken(storedToken);
-          try {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-          } catch (error) {
-            console.error("Erro ao analisar os dados do usuário:", error);
-            _removeLocalStorage("access_token");
-            _removeLocalStorage("user");
-          }
+      if (storedToken && storedUser && !user && !token) {
+        setToken(storedToken);
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+        } catch (error) {
+          console.error("Erro ao analisar os dados do usuário:", error);
+          _removeLocalStorage("access_token");
+          _removeLocalStorage("user");
         }
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadUserData();
   }, [user, token]);
 
@@ -104,6 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
+        loadUserData();
         return true;
       }
       return false;

@@ -104,7 +104,10 @@ export default function Dashboard() {
                 </div>
 
                 <div className="lg:col-span-1">
-                  <CaloriesCard meals={meals ? meals : []} />
+                  <CaloriesCard
+                    meals={meals ? meals : []}
+                    userCaloriesTarget={user?.calorieTarget}
+                  />
                 </div>
               </div>
             </div>
