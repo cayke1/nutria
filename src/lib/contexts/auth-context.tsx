@@ -60,8 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             _removeLocalStorage("access_token");
             _removeLocalStorage("user");
           }
-        } else {
-          console.log("Nenhum dado de usuário encontrado no localStorage");
         }
       } finally {
         setIsLoading(false);

@@ -26,11 +26,11 @@ export function MealCard({
     snack: Coffee,
     dinner: Moon,
   };
-
+  const isTodayMeal = new Date(meal.dateTime) < new Date(Date.now() + 86400000);
   const Icon = mealTypeIcons[meal.type];
 
   return (
-    <Card className="w-full">
+    <Card className={`w-full ${isTodayMeal ? "opacity-50" : ""}`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center">
