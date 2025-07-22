@@ -147,6 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken(data.session.token);
         _setLocalStorage("access_token", data.session.token);
         _setLocalStorage("user", JSON.stringify(data.user));
+        await sleep(1000);
         push("/dashboard");
       } else {
         console.error("Código inválido ou expirado.");
